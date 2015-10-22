@@ -8,6 +8,7 @@
   <name>searcher-server Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <dependencies>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -15,28 +16,52 @@
       <scope>test</scope>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>com.lucene.demo</groupId>-->
+      <!--<artifactId>5.3.1</artifactId>-->
+      <!--<version>0.1</version>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>com.lucene</groupId>-->
+      <!--<artifactId>5.3.1</artifactId>-->
+      <!--<version>0.1</version>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>com.lucene.analyzers.common</groupId>-->
+      <!--<artifactId>5.3.1</artifactId>-->
+      <!--<version>0.1</version>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>com.lucene.queryparser</groupId>-->
+      <!--<artifactId>5.3.1</artifactId>-->
+      <!--<version>0.1</version>-->
+    <!--</dependency>-->
+
     <dependency>
-      <groupId>com.lucene.demo</groupId>
-      <artifactId>5.3.1</artifactId>
-      <version>0.1</version>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>4.8.0</version>
     </dependency>
 
     <dependency>
-      <groupId>com.lucene</groupId>
-      <artifactId>5.3.1</artifactId>
-      <version>0.1</version>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers-common</artifactId>
+      <version>4.8.0</version>
     </dependency>
 
     <dependency>
-      <groupId>com.lucene.analyzers.common</groupId>
-      <artifactId>5.3.1</artifactId>
-      <version>0.1</version>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
+      <version>4.8.0</version>
     </dependency>
 
     <dependency>
-      <groupId>com.lucene.queryparser</groupId>
-      <artifactId>5.3.1</artifactId>
-      <version>0.1</version>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-highlighter</artifactId>
+      <version>4.8.0</version>
     </dependency>
 
 
@@ -126,7 +151,7 @@
     <dependency>
       <groupId>org.wltea.ik-analyzer</groupId>
       <artifactId>ik-analyzer</artifactId>
-      <version>3.2.8</version>
+      <version>2012f</version>
     </dependency>
 
   </dependencies>

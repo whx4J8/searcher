@@ -1,27 +1,109 @@
 package com.hxing.index;
 
-import com.hxing.util.DocumentUtil;
+import com.hxing.util.DocAdapter;
+import com.hxing.util.DocUtil;
+import com.hxing.util.PageUtil;
+import com.hxing.util.QueryBuilder;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleFragmenter;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by wanghongxing on 15/10/19.
  */
+
 public class IndexClient{
 
-    public List<Document> sampleQuery(String field,String word) throws ParseException, IOException {
-        return sampleQuery(field,word,20);
+
+    /**
+     *
+     * @param field
+     * @param word
+     * @param pageSize
+     * @param curPage
+     * @param max
+     * @return
+     * @throws ParseException
+     * @throws IOException
+     */
+    public static IndexPageResult pageHiglightQuery(String field,String word,int pageSize,int curPage,int max) throws ParseException, IOException {
+
+        Query query = QueryBuilder.buildSampleQuery(field, word);
+        SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<span>", "</span>");
+        Highlighter highlighter = new Highlighter(simpleHTMLFormatter,new QueryScorer(query));
+
+        ScoreDoc[] totalScoreDocs = IndexContext.INDEX_SEARCHER.search(query,max).scoreDocs;
+
+        int start = PageUtil.getStart(pageSize, curPage);
+        int end = PageUtil.getEnd(pageSize,curPage);
+        ScoreDoc[] pageScoreDocs = new ScoreDoc[end-start];
+        for(int i=start ;i<end;i++)
+            pageScoreDocs[i-start] = totalScoreDocs[i];
+
+        return DocUtil.toHighDocument(pageScoreDocs,highlighter);
     }
 
     /**
+     *
+     * @param field     搜索域
+     * @param word      被搜索短语
+     * @param pageSize  没页数量
+     * @param curPage   当前页码
+     * @param max       最大查询数量
+     * @return
+     */
+    public static IndexPageResult pageQuery(String field,String word,int pageSize,int curPage,int max) throws IOException, ParseException {
+        Query query = QueryBuilder.buildSampleQuery(field,word);
+        ScoreDoc[] totalScoreDocs = IndexContext.INDEX_SEARCHER.search(query,max).scoreDocs;
+
+        int start = PageUtil.getStart(pageSize,curPage);
+        int end = PageUtil.getEnd(pageSize,curPage);
+        ScoreDoc[] pageScoreDocs = new ScoreDoc[end-start];
+        for(int i=start ;i<end;i++)
+            pageScoreDocs[i-start] = totalScoreDocs[i];
+
+        return new IndexPageResult(totalScoreDocs.length, DocUtil.toDocuments(pageScoreDocs));
+    }
+
+
+    /**
+     *
+     * @param field     搜索域
+     * @param word      被搜索短语
+     * @param pageSize  没页数量
+     * @param curPage   当前页码
+     * @return
+     */
+    public static IndexPageResult pageQuery(String field,String word,int pageSize,int curPage) throws ParseException, IOException {
+        return pageQuery(field,word,pageSize,curPage,100000);
+    }
+
+
+    /**
+     * 缺省型单一域查询
+     *
+     * @param field
+     * @param word
+     * @return
+     * @throws ParseException
+     * @throws IOException
+     */
+    public static List<Document> sampleQuery(String field,String word) throws ParseException, IOException {
+
+        return sampleQuery(field, word, 20);
+    }
+
+    /**
+     * 单一域查询
      *
      * @param field
      * @param word
@@ -30,29 +112,31 @@ public class IndexClient{
      * @throws ParseException
      * @throws IOException
      */
-    public List<Document> sampleQuery(String field,String word,int num) throws ParseException, IOException {
-        QueryParser parser = new QueryParser(field,IndexContext.INDEX_ANALYZER);
-        Query query = parser.parse(word);
-        ScoreDoc[] hits = IndexContext.INDEX_SEARCHER.search(query,num).scoreDocs;
-        return DocumentUtil.toDocuments(hits,IndexContext.INDEX_SEARCHER);
+    public static List<Document> sampleQuery(String field,String word,int num) throws ParseException, IOException {
+        ScoreDoc[] hits = IndexContext.INDEX_SEARCHER.search(QueryBuilder.
+                buildSampleQuery(field, word),null,num).scoreDocs;
+
+        return DocUtil.toDocuments(hits, IndexContext.INDEX_SEARCHER);
     }
 
-    public void delete(Term term) throws IOException {
+    public static void delete(Term term) throws IOException {
         IndexContext.INDEX_WRITER.deleteDocuments(term);
     }
 
-    public void save(Document document) throws IOException {
+    public static void save(Document document) throws IOException {
         IndexContext.INDEX_WRITER.addDocument(document);
     }
 
-    public void save(DocumentAdapter adapter) throws IOException {
+    public static void save(List<Document> documents) throws IOException {
+        IndexContext.INDEX_WRITER.addDocuments(documents);
+    }
+
+    public static void save(DocAdapter adapter) throws IOException {
         save(adapter.adapter());
     }
 
-
-    public void commitWriter() throws IOException {
+    public static void commit() throws IOException {
         IndexContext.INDEX_WRITER.commit();
     }
-
 
 }

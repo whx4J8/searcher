@@ -3,6 +3,7 @@ package com.hxing.index;
 import com.hxing.exception.IndexConfigException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.util.Version;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 /**
@@ -11,7 +12,7 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 public enum LanguageAnalyzer {
 
     Chinese(0,"Chinese",new IKAnalyzer()),
-    English(1,"English",new StandardAnalyzer())
+    English(1,"English",new StandardAnalyzer(Version.LUCENE_48))
     ;
 
     LanguageAnalyzer(int value, String name,Analyzer analyzer) {

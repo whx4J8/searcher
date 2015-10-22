@@ -1,18 +1,18 @@
-package com.hxing.index;
+package com.hxing.util;
 
 import org.apache.lucene.document.Document;
 
 /**
- * Created by wanghongxing on 15/10/19.
+ * Created by wanghongxing on 15/10/21.
  */
-public abstract class DocumentAdapter {
+public abstract class DocAdapter {
 
     /**
      * 源对象
      */
     private Object object;
 
-    public DocumentAdapter(Object object) {
+    public DocAdapter(Object object) {
         this.object = object;
     }
 
@@ -21,5 +21,4 @@ public abstract class DocumentAdapter {
      * @return
      */
     public abstract Document adapter();
-
 }
