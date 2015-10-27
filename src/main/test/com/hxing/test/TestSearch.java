@@ -20,7 +20,10 @@ public class TestSearch {
 
         try {
             List<Document> docs = IndexClient.sampleQuery("title","度假");
+            //List<Document> docs = IndexClient.sampleQuery("descrip","洗涤");
+            int num = 1;
             for(Document doc:docs){
+                System.out.println(num++);
                 System.out.println(doc.getField("id"));
                 System.out.println(doc.getField("name"));
                 System.out.println(doc.getField("title"));

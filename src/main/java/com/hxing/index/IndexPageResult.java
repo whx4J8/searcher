@@ -32,4 +32,5 @@ public class IndexPageResult {
     public void setDocs(List<Document> docs) {
         this.docs = docs;
     }
+
 }

@@ -1,8 +1,8 @@
 package com.hxing.index;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.highlight.Highlighter;
 
-import javax.swing.text.Highlighter;
 import java.util.List;
 
 /**

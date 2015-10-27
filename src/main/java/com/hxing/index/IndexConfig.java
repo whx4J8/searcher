@@ -1,7 +1,5 @@
 package com.hxing.index;
 
-import org.springframework.beans.factory.InitializingBean;
-
 /**
  * Created by wanghongxing on 15/10/19.
  */
@@ -25,4 +23,5 @@ public class IndexConfig{
     public void setLanguage(String language) {
         this.language = language;
     }
+
 }

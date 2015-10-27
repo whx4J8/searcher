@@ -43,7 +43,7 @@ public class TestIndex {
                     builder.add(new LongField("id", hotel.getId(), Field.Store.YES))
                             .add(new TextField("name",hotel.getName(),Field.Store.YES))
                             .add(new TextField("title",hotel.getTitle(),Field.Store.YES))
-                            .add(new StringField("descrip",hotel.getDescrip(),Field.Store.NO));
+                            .add(new TextField("descrip",hotel.getDescrip(),Field.Store.NO));//不存储不会查询出来
 
                     return builder.getDoc();
 

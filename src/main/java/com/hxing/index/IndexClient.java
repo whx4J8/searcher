@@ -11,10 +11,11 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleFragmenter;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,7 +23,6 @@ import java.util.List;
  */
 
 public class IndexClient{
-
 
     /**
      *
@@ -35,7 +35,7 @@ public class IndexClient{
      * @throws ParseException
      * @throws IOException
      */
-    public static IndexPageResult pageHiglightQuery(String field,String word,int pageSize,int curPage,int max) throws ParseException, IOException {
+    private static IndexHighPageResult pageHiglightQuery(String field,String word,int pageSize,int curPage,int max) throws ParseException, IOException {
 
         Query query = QueryBuilder.buildSampleQuery(field, word);
         SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<span>", "</span>");
@@ -44,12 +44,18 @@ public class IndexClient{
         ScoreDoc[] totalScoreDocs = IndexContext.INDEX_SEARCHER.search(query,max).scoreDocs;
 
         int start = PageUtil.getStart(pageSize, curPage);
-        int end = PageUtil.getEnd(pageSize,curPage);
-        ScoreDoc[] pageScoreDocs = new ScoreDoc[end-start];
-        for(int i=start ;i<end;i++)
-            pageScoreDocs[i-start] = totalScoreDocs[i];
+        int end = PageUtil.getEnd(pageSize, curPage);
+        List<ScoreDoc> pageScoreDocs = new ArrayList<>();
+        for(int i=start ;i<end;i++){
+            if(i>=totalScoreDocs.length) break;
+            pageScoreDocs.add(totalScoreDocs[i]);
+        }
 
-        return DocUtil.toHighDocument(pageScoreDocs,highlighter);
+        return new IndexHighPageResult(totalScoreDocs.length,DocUtil.toDocuments(pageScoreDocs),highlighter);
+    }
+
+    public static IndexHighPageResult pageHiglightQuery(String field,String word,int pageSize,int curPage) throws IOException, ParseException {
+        return pageHiglightQuery(field,word,pageSize, curPage, pageSize*(curPage+1));
     }
 
     /**
@@ -61,19 +67,36 @@ public class IndexClient{
      * @param max       最大查询数量
      * @return
      */
-    public static IndexPageResult pageQuery(String field,String word,int pageSize,int curPage,int max) throws IOException, ParseException {
-        Query query = QueryBuilder.buildSampleQuery(field,word);
+    private static IndexPageResult pageQuery(String field,String word,int pageSize,int curPage,int max) throws IOException, ParseException {
+
+        Query query = QueryBuilder.buildSampleQuery(field, word);
         ScoreDoc[] totalScoreDocs = IndexContext.INDEX_SEARCHER.search(query,max).scoreDocs;
 
-        int start = PageUtil.getStart(pageSize,curPage);
-        int end = PageUtil.getEnd(pageSize,curPage);
-        ScoreDoc[] pageScoreDocs = new ScoreDoc[end-start];
-        for(int i=start ;i<end;i++)
-            pageScoreDocs[i-start] = totalScoreDocs[i];
+        int start = PageUtil.getStart(pageSize, curPage);
+        int end = PageUtil.getEnd(pageSize, curPage);
+        List<ScoreDoc> pageScoreDocs = new ArrayList<>();
+        for(int i=start ;i<end;i++){
+            if(i>=totalScoreDocs.length) break;
+            pageScoreDocs.add(totalScoreDocs[i]);
+        }
 
         return new IndexPageResult(totalScoreDocs.length, DocUtil.toDocuments(pageScoreDocs));
     }
 
+
+//    private static List<ScoreDoc> pageQuery(Query query,int pageSize,int curPage,int max) throws IOException {
+//        ScoreDoc[] totalScoreDocs = IndexContext.INDEX_SEARCHER.search(query,max).scoreDocs;
+//
+//        int start = PageUtil.getStart(pageSize, curPage);
+//        int end = PageUtil.getEnd(pageSize, curPage);
+//        List<ScoreDoc> pageScoreDocs = new ArrayList<>();
+//        for(int i=start ;i<end;i++){
+//            if(i>=totalScoreDocs.length) break;
+//            pageScoreDocs.add(totalScoreDocs[i]);
+//        }
+//
+//        return pageScoreDocs;
+//    }
 
     /**
      *
@@ -84,7 +107,7 @@ public class IndexClient{
      * @return
      */
     public static IndexPageResult pageQuery(String field,String word,int pageSize,int curPage) throws ParseException, IOException {
-        return pageQuery(field,word,pageSize,curPage,100000);
+        return pageQuery(field, word, pageSize, curPage, pageSize*(curPage+1));
     }
 
 
@@ -116,7 +139,7 @@ public class IndexClient{
         ScoreDoc[] hits = IndexContext.INDEX_SEARCHER.search(QueryBuilder.
                 buildSampleQuery(field, word),null,num).scoreDocs;
 
-        return DocUtil.toDocuments(hits, IndexContext.INDEX_SEARCHER);
+        return DocUtil.toDocuments(Arrays.asList(hits), IndexContext.INDEX_SEARCHER);
     }
 
     public static void delete(Term term) throws IOException {
@@ -126,6 +149,7 @@ public class IndexClient{
     public static void save(Document document) throws IOException {
         IndexContext.INDEX_WRITER.addDocument(document);
     }
+
 
     public static void save(List<Document> documents) throws IOException {
         IndexContext.INDEX_WRITER.addDocuments(documents);

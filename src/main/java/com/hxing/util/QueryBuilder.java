@@ -11,6 +11,13 @@ import org.apache.lucene.util.Version;
  */
 public class QueryBuilder {
 
+    /**
+     * 创建SampleQuery对象
+     * @param field
+     * @param word
+     * @return
+     * @throws ParseException
+     */
     public static Query buildSampleQuery(String field,String word) throws ParseException {
 
         QueryParser parser = new QueryParser(Version.LUCENE_48,field,
